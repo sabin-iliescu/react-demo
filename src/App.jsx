@@ -1,35 +1,94 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const choices = ["rock", "paper", "scissors"];
+  const [playerChoice, setPlayerChoice] = useState("");
+  const [computerChoice, setComputerChoice] = useState("");
+  const [result, setResult] = useState("");
+  const [playerScore, setPlayerScore] = useState(0);
+  const [computerScore, setComputerScore] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+
+  const playGame = (choice) => {
+    if (gameOver) return;
+
+    setPlayerChoice(choice);
+    const randomChoice = choices[Math.floor(Math.random() * choices.length)];
+    setComputerChoice(randomChoice);
+    determineWinner(choice, randomChoice);
+  };
+
+  const determineWinner = (player, computer) => {
+    if (player === computer) {
+      setResult("It's a draw!");
+    } else if (
+      (player === "rock" && computer === "scissors") ||
+      (player === "scissors" && computer === "paper") ||
+      (player === "paper" && computer === "rock")
+    ) {
+      setResult("You win this round!");
+      setPlayerScore((prevScore) => {
+        const newScore = prevScore + 1;
+        if (newScore === 3) {
+          setGameOver(true);
+          setResult("You win the game!");
+        }
+        return newScore;
+      });
+    } else {
+      setResult("Computer wins this round!");
+      setComputerScore((prevScore) => {
+        const newScore = prevScore + 1;
+        if (newScore === 3) {
+          setGameOver(true);
+          setResult("Computer wins the game!");
+        }
+        return newScore;
+      });
+    }
+  };
+
+  const resetGame = () => {
+    setPlayerChoice("");
+    setComputerChoice("");
+    setResult("");
+    setPlayerScore(0);
+    setComputerScore(0);
+    setGameOver(false);
+  };
 
   return (
-    <>
+    <div className="App">
+      <h1>Rock Paper Scissors</h1>
+
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+        <h2>Make your choice</h2>
+        <button onClick={() => playGame("rock")} disabled={gameOver}>
+          Rock
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+        <button onClick={() => playGame("paper")} disabled={gameOver}>
+          Paper
+        </button>
+        <button onClick={() => playGame("scissors")} disabled={gameOver}>
+          Scissors
+        </button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <div>
+        <h3>Your choice: {playerChoice}</h3>
+        <h3>Computer's choice: {computerChoice}</h3>
+        <h2>{result}</h2>
+      </div>
+
+      <div>
+        <h3>Your Score: {playerScore}</h3>
+        <h3>Computer Score: {computerScore}</h3>
+      </div>
+
+      {gameOver && <button onClick={resetGame}>Reset Game</button>}
+    </div>
+  );
 }
 
-export default App
+export default App;
